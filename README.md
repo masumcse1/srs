@@ -5,16 +5,19 @@
 
  wildfy start : standalone.bat -c standalone-full.xml
 
-                 add-user.bat -a -u masum -p Masum@1234 
+ create management user :  add-user.bat -a -u masum -p Masum@1234  
 
-                add-user.bat -a -u murad -p Murad@1234 -g guest
+  create app user :        add-user.bat -a -u murad -p Murad@1234 -g guest
 
-               jboss-cli.bat 
+                           jboss-cli.bat 
 
-               connect 
+                            connect 
  
-              jms-topic add --topic-address=RegCourseTopic --entries=topic/RegCourseTopic,java:jboss/exported/jms/topic/RegCourseTopic
+ create topic :              jms-topic add --topic-address=RegCourseTopic --entries=topic/RegCourseTopic,java:jboss/exported/jms/topic/RegCourseTopic
   
   xml : 
   
    <jms-topic name="RegCourseTopic" entries="topic/RegCourseTopic java:jboss/exported/jms/topic/RegCourseTopic"/>
+   
+   
+   
