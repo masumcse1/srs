@@ -9,6 +9,9 @@ import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.Attribute;
 import javax.persistence.metamodel.EntityType;
 import javax.transaction.UserTransaction;
+
+import util.EntityManagerFactoryS;
+
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.sql.Connection;
@@ -19,9 +22,10 @@ import java.util.List;
 
 public abstract class PersonDao {
 
-    @PersistenceUnit
-    static EntityManagerFactory emf= Persistence.createEntityManagerFactory("my_persistence_unit");;
-    @PersistenceContext
+   
+	
+	
+	@PersistenceContext
     static EntityManager em;
     @Resource
     static UserTransaction utx;
@@ -41,7 +45,7 @@ public abstract class PersonDao {
     }
 
     public static Person login(String userId, String password) throws SQLException, NamingException, NoSuchAlgorithmException, InvalidKeySpecException {
-        em=emf.createEntityManager();
+        em=EntityManagerFactoryS.getEntityManagerFactory().createEntityManager();
         Person person=null;
         try{
             person=(Person)em.createQuery("SELECT p FROM  Person p WHERE p.id=:userId").setParameter("userId",userId).getSingleResult();
@@ -59,7 +63,7 @@ public abstract class PersonDao {
     }
 
     public static boolean isStillLoggedIn(String userId, String password) throws SQLException, NamingException {
-        em=emf.createEntityManager();
+    	em=EntityManagerFactoryS.getEntityManagerFactory().createEntityManager();
         Person person=(Person)em.createQuery("SELECT p FROM  Person p WHERE p.id=:userId").setParameter("userId",userId).getSingleResult();
         if(person!=null){
             boolean authenticate=person.getPassword().equals(password);
@@ -76,13 +80,13 @@ public abstract class PersonDao {
     }
 
     public static boolean isRegistered(String userId) throws SQLException, NamingException {
-        em=emf.createEntityManager();
+    	em=EntityManagerFactoryS.getEntityManagerFactory().createEntityManager();
         Person person=(Person)em.createQuery("SELECT p FROM  Person p WHERE p.id=:userId").setParameter("userId",userId).getSingleResult();
         return person!=null;
     }
 
     protected static boolean save(Person person) throws SQLException, NoSuchAlgorithmException, InvalidKeySpecException, NamingException {
-        em=emf.createEntityManager();
+    	em=EntityManagerFactoryS.getEntityManagerFactory().createEntityManager();
         em.getTransaction().begin();
         String fullAddress=person.address+" "+person.city+", "+person.state+" "+person.zipCode;
         person.setAddress(fullAddress);
@@ -105,7 +109,7 @@ public abstract class PersonDao {
     }
 
     public static List<Person> getPersonsByLastName(String lastName){
-        em=emf.createEntityManager();
+    	em=EntityManagerFactoryS.getEntityManagerFactory().createEntityManager();
         em.getTransaction().begin();
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Person> cq = cb.createQuery(Person.class);

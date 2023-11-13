@@ -19,11 +19,11 @@ public class MessageBean implements MessageListener {
                 String courseName = mapMessage.getString("Course_Name");
                 String dateOfRegistration = mapMessage.getString("Date_of_Registration");
 
-                System.out.println("Received Message:");
-                System.out.println("User_ID: " + userId);
-                System.out.println("Course_ID: " + courseId);
-                System.out.println("Course_Name: " + courseName);
-                System.out.println("Date_of_Registration: " + dateOfRegistration);
+                System.out.println("Received Message: from MDB--->>>");
+                System.out.println("User_ID--: " + userId);
+                System.out.println("Course_ID--: " + courseId);
+                System.out.println("Course_Name--: " + courseName);
+                System.out.println("Date_of_Registration--: " + dateOfRegistration);
             }
         } catch (JMSException e) {
             e.printStackTrace();
