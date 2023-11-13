@@ -5,7 +5,7 @@
 
   create app user :       sh add-user.sh -a -u murad -p Murad@1234 -g guest
 
-                         jboss-cli.bat 
+                         sh jboss-cli.sh 
 
                          connect 
  
