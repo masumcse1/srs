@@ -21,12 +21,12 @@ public class RegistrationSupportBean implements Serializable {
     private static String message="";
     private static String messageCSSClass="error";
 
-    @Resource(mappedName = "java:/topic/myTopic")
+    @Resource(mappedName = "java:/topic/RegCourseTopic")
     private Topic topic;
- 
+
     @Inject
     private JMSContext context;
-    
+
     public long getCourseCapacity() {
         return courseCapacity;
     }
@@ -116,8 +116,8 @@ public void register() {
 
                 // Send Message
                 try {
-            
-                	
+
+
                     MapMessage message = context.createMapMessage();
                     message.setString("User_ID", student.getId());
                     message.setLong("Course_ID", course.getCourseId());
@@ -129,7 +129,7 @@ public void register() {
                 } catch (JMSException e) {
                     // Handle JMS exception
                     System.out.println("Error sending JMS message: " + e.getMessage());
-                } 
+                }
             } else {
                 setMessage("Course is full");
                 setMessageCSSClass("error");
@@ -146,7 +146,7 @@ public void register() {
     }
 }
 
- 
+
     public String getSelectedCourse() {
         return selectedCourse;
     }
@@ -171,5 +171,5 @@ public void register() {
         this.messageCSSClass = messageCSSClass;
     }
 
-    
+
 }
