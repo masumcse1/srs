@@ -3,6 +3,7 @@ package com.chen.srs;
 import javax.annotation.Resource;
 import javax.enterprise.context.SessionScoped;
 import javax.faces.context.FacesContext;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.jms.*;
 import javax.servlet.http.HttpSession;
@@ -18,22 +19,14 @@ public class RegistrationSupportBean implements Serializable {
     private String selectedCourse;
     private long courseCapacity;
     private static String message="";
-
     private static String messageCSSClass="error";
-
-    @Resource(lookup="java:jboss/DefaultJMSConnectionFactory")
-    private ConnectionFactory connectionFactory;
-
-    @Resource(mappedName = "java:/queue/exampleQueue")
-    private Queue queue;
 
     @Resource(mappedName = "java:/topic/myTopic")
     private Topic topic;
-
-    //private JMSContext context;
-
-    private Connection connection;
-
+ 
+    @Inject
+    private JMSContext context;
+    
     public long getCourseCapacity() {
         return courseCapacity;
     }
@@ -41,14 +34,6 @@ public class RegistrationSupportBean implements Serializable {
     public void setCourseCapacity(long courseCapacity) {
         this.courseCapacity = courseCapacity;
     }
-
-    private Session msgSession;
-
-
-    private MessageProducer producer;
-    private MessageProducer producerQueue;
-    private MessageProducer producerTopic;
-
 
 //    public void register() {
 //        try{
@@ -131,22 +116,20 @@ public void register() {
 
                 // Send Message
                 try {
-                    initJMSComponents(); // Initialize JMS components
-
-                    MapMessage message = msgSession.createMapMessage();
+            
+                	
+                    MapMessage message = context.createMapMessage();
                     message.setString("User_ID", student.getId());
                     message.setLong("Course_ID", course.getCourseId());
                     message.setString("Course_Name", course.getCourseTitle());
                     message.setString("Date_of_Registration", LocalDate.now().toString());
 
-                    producerQueue.send(message);
-                    producerTopic.send(message);
+            		context.createProducer().send(topic, message);
+            		   System.out.println("Message send done!");
                 } catch (JMSException e) {
                     // Handle JMS exception
                     System.out.println("Error sending JMS message: " + e.getMessage());
-                } finally {
-                    closeJMSResources(); // Close JMS resources in a finally block
-                }
+                } 
             } else {
                 setMessage("Course is full");
                 setMessageCSSClass("error");
@@ -163,21 +146,7 @@ public void register() {
     }
 }
 
-    private void initJMSComponents() throws JMSException {
-        if (connection == null) connection = connectionFactory.createConnection();
-        if (msgSession == null) msgSession = connection.createSession();
-        if (producerTopic == null) producerTopic = msgSession.createProducer(topic);
-    }
-
-    private void closeJMSResources() {
-        try {
-            if (producerTopic != null) producerTopic.close();
-            if (msgSession != null) msgSession.close();
-            if (connection != null) connection.close();
-        } catch (JMSException e) {
-            System.out.println("Error closing JMS resources: " + e.getMessage());
-        }
-    }
+ 
     public String getSelectedCourse() {
         return selectedCourse;
     }
@@ -202,16 +171,5 @@ public void register() {
         this.messageCSSClass = messageCSSClass;
     }
 
-    @Override
-    protected void finalize(){
-        if(connection!=null){
-            try{
-                connection.close();
-            }
-            catch(JMSException e){
-                System.out.println(e.getMessage());
-            }
-
-        }
-    }
+    
 }
