@@ -13,8 +13,8 @@
 
                connect 
  
-              jms-topic add --topic-address=myTopic --entries=topic/myTopic,java:jboss/exported/jms/topic/myTopic
+              jms-topic add --topic-address=RegCourseTopic --entries=topic/RegCourseTopic,java:jboss/exported/jms/topic/RegCourseTopic
   
   xml : 
   
-   <jms-topic name="myTopic" entries="topic/myTopic java:jboss/exported/jms/topic/myTopic"/>
+   <jms-topic name="RegCourseTopic" entries="topic/RegCourseTopic java:jboss/exported/jms/topic/RegCourseTopic"/>
