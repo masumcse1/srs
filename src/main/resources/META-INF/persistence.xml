@@ -17,7 +17,7 @@
 			<property name="hibernate.dialect" 				value="org.hibernate.dialect.H2Dialect" />
 
 			<property name="hibernate.hbm2ddl.auto" value="create" />
-			<property name="hibernate.connection.url" 				value="jdbc:h2:mem:testdbdhaka" />
+			 <property name="hibernate.connection.url" value="jdbc:h2:tcp://localhost/~/H2_784_DB"/>
 			<property name="hibernate.show_sql" value="true" />
 		</properties>
 	</persistence-unit>
