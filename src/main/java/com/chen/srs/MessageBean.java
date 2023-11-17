@@ -5,7 +5,7 @@ import javax.ejb.MessageDriven;
 import javax.jms.*;
 
 @MessageDriven(activationConfig = {
-		@ActivationConfigProperty(propertyName = "destinationLookup", propertyValue = "java:/topic/myTopic"),
+		@ActivationConfigProperty(propertyName = "destinationLookup", propertyValue = "java:/topic/RegCourseTopic"),
 		@ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Topic"), })
 public class MessageBean implements MessageListener {
 
