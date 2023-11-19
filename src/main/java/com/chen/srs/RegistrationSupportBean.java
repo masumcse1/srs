@@ -22,6 +22,8 @@ import javax.transaction.NotSupportedException;
 import javax.transaction.RollbackException;
 import javax.transaction.SystemException;
 
+import util.BusinessException;
+
 @Named
 @SessionScoped
 public class RegistrationSupportBean implements Serializable {
@@ -31,22 +33,17 @@ public class RegistrationSupportBean implements Serializable {
     private static String message="";
     private static String messageCSSClass="error";
 
-    @Resource(mappedName = "java:/topic/RegCourseTopic")
-    private Topic topic;
 
-    @Inject
-    private JMSContext context;
     
     private List<Course> courses ;
 
 	@EJB
 	private CourseDao courseDao;
+	
 	@EJB
-	private RegistrationDao registrationDao;
+	private RegistrarCourseBean registrarCourseBean;
 
-	@EJB
-	private PersonDao personDao;
-
+	
 	@PostConstruct
 	public void init() {
 
@@ -70,115 +67,26 @@ public class RegistrationSupportBean implements Serializable {
 		}
 	}
 
-//    public void register() {
-//        try{
-//            FacesContext facesContext=FacesContext.getCurrentInstance();
-//            final long courseCapacity=Long.parseLong(facesContext.getExternalContext().getInitParameter("course-capacity"));
-//            String courseTitle=selectedCourse.split("\\.")[1];
-//            Course course=(Course)CourseDao.getCourseByTitle(courseTitle);
-//            if(course!=null){
-//                long numberRegistered=(Long)RegistrationDao.getCourseStatus(course.getCourseTitle());
-//                if(numberRegistered<courseCapacity){
-//                    HttpSession session=(HttpSession) facesContext.getExternalContext().getSession(true);
-//                    Student student=(Student)session.getAttribute("student");
-//                    Registration registration=new Registration(course.getCourseId(),numberRegistered+1,student);
-//                    RegistrationDao.save(registration);
-//                    setMessage("Registration for "+selectedCourse+" successful");
-//                    setMessageCSSClass("success");
-//                    //send Message
-//                    try{
-//                        System.out.println("Connection Factory: "+connectionFactory);
-//                        if(connection==null) connection=connectionFactory.createConnection();
-//                        System.out.println("Connection: "+connection);
-//                        if(msgSession==null) msgSession=connection.createSession();
-//                        System.out.println("Session: "+msgSession);
-//                        MessageProducer producerQueue=msgSession.createProducer(queue);
-//                        System.out.println("Queue: "+queue);
-//                        MessageProducer producerTopic=msgSession.createProducer(topic);
-//                        System.out.println("Topic: "+topic);
-//                        MessageConsumer consumerTopic=msgSession.createConsumer(topic);
-//                        MapMessage message=msgSession.createMapMessage();
-//                        message.setString("Text","hello");
-//                        System.out.println("Sending message "+message);
-//                        producerQueue.send(message);
-//                        producerTopic.send(message);
-//                    }
-//                    catch(JMSException e){
-//                        System.out.println(e.getMessage());
-//                        if(connection!=null){
-//                            try{
-//                                connection.close();
-//                            }
-//                            catch (JMSException err){
-//                                System.out.println(err.getMessage());
-//                            }
-//                        }
-//                    }
-//                }
-//                else{
-//                    setMessage("Course is full");
-//                    setMessageCSSClass("error");
-//                }
-//            }
-//            else{
-//                setMessage("Course does not exist");
-//                setMessageCSSClass("error");
-//            }
-//        }
-//        catch(SystemException | NotSupportedException e){
-//            System.out.println(e.getMessage());
-//            setMessage("Something went wrong");
-//            setMessageCSSClass("error");
-//        }
-//    }
-public void register() {
-    try {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        final long courseCapacity = Long.parseLong(facesContext.getExternalContext().getInitParameter("course-capacity"));
-        Course course = (Course) courseDao.getCourseById(Long.valueOf(selectedCourse));
 
-        if (course != null) {
-            long numberRegistered = (Long) registrationDao.getCourseStatus(course.getCourseTitle());
-
-            if (numberRegistered < courseCapacity) {
-                HttpSession session = (HttpSession) facesContext.getExternalContext().getSession(true);
-                Student student = (Student) session.getAttribute("student");
-                Registration registration = new Registration(course.getCourseId(), numberRegistered + 1, student);
-                registrationDao.save(registration);
-                setMessage("Registration for " + selectedCourse + " successful");
-                setMessageCSSClass("success");
-
-                // Send Message
-                try {
+	public void register() {
+	    try {
+	        FacesContext facesContext = FacesContext.getCurrentInstance();
+	        final long courseCapacity = Long.parseLong(facesContext.getExternalContext().getInitParameter("course-capacity"));
+	        HttpSession session = (HttpSession) facesContext.getExternalContext().getSession(true);
+            Student student = (Student) session.getAttribute("student");
+	        String successMessage = registrarCourseBean.register(Long.valueOf(selectedCourse), courseCapacity, student);
+	        setMessage(successMessage);
+	        setMessageCSSClass("success");
+	        
+	    } catch (Exception e) {
+	        // Handle exception
+	        System.out.println("Error during registration: " + e.getMessage());
+	        setMessage(e.getMessage());
+	        setMessageCSSClass("error");
+	    }
+	}
 
 
-                    MapMessage message = context.createMapMessage();
-                    message.setString("User_ID", student.getId());
-                    message.setLong("Course_ID", course.getCourseId());
-                    message.setString("Course_Name", course.getCourseTitle());
-                    message.setString("Date_of_Registration", LocalDate.now().toString());
-
-            		context.createProducer().send(topic, message);
-            		   System.out.println("Message send done!");
-                } catch (JMSException e) {
-                    // Handle JMS exception
-                    System.out.println("Error sending JMS message: " + e.getMessage());
-                }
-            } else {
-                setMessage("Course is full");
-                setMessageCSSClass("error");
-            }
-        } else {
-            setMessage("Course does not exist");
-            setMessageCSSClass("error");
-        }
-    } catch (SystemException | NotSupportedException e) {
-        // Handle exception
-        System.out.println("Error during registration: " + e.getMessage());
-        setMessage("Something went wrong");
-        setMessageCSSClass("error");
-    }
-}
 
 
     public String getSelectedCourse() {
