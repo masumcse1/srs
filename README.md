@@ -1,9 +1,10 @@
 # srs
 ================Configure=================
  wildfy start : sh standalone.sh -c standalone-full.xml
- create management user : sh add-user.sh -a -u masum -p Masum@1234  
+ 
+ create management user : sh add-user.sh -a -u masum -p acec@1234@1234  
 
-  create app user :       sh add-user.sh -a -u murad -p Murad@1234 -g guest
+  create app user :       sh add-user.sh -a -u murad -p acec@1234 -g guest
 
                          sh jboss-cli.sh 
 
@@ -15,3 +16,4 @@
    
    
    
+==================JTA ========================
