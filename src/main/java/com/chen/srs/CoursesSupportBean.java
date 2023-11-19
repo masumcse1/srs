@@ -1,5 +1,6 @@
 package com.chen.srs;
 
+import javax.ejb.EJB;
 import javax.enterprise.context.SessionScoped;
 import javax.faces.model.SelectItem;
 import javax.inject.Named;
@@ -16,10 +17,13 @@ public class CoursesSupportBean implements Serializable {
     private String selectedCourse="1";
     private final static List<SelectItem> courseItems=createCourseItems();
 
+    @EJB
+	private static CourseDao courseDao;
+    
     public CoursesSupportBean(){}
 
     public List getCourses() throws SystemException, NotSupportedException, HeuristicRollbackException, HeuristicMixedException, RollbackException {
-        return CourseDao.getCourses();
+        return courseDao.getCourses();
     }
 
     public void setCourses(List<Course> courses){
@@ -38,7 +42,7 @@ public class CoursesSupportBean implements Serializable {
     private static List<SelectItem> createCourseItems() {
         List courses=null;
         try {
-            courses = CourseDao.getCourses();
+            courses = courseDao.getCourses();
         }
         catch(SystemException | NotSupportedException | RuntimeException | RollbackException | HeuristicRollbackException | HeuristicMixedException e){
             System.out.println(e.getMessage());

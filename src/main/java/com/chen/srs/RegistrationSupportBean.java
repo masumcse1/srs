@@ -1,16 +1,26 @@
 package com.chen.srs;
 
+import java.io.Serializable;
+import java.time.LocalDate;
+import java.util.List;
+
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import javax.ejb.EJB;
 import javax.enterprise.context.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.jms.*;
+import javax.jms.JMSContext;
+import javax.jms.JMSException;
+import javax.jms.MapMessage;
+import javax.jms.Topic;
 import javax.servlet.http.HttpSession;
+import javax.transaction.HeuristicMixedException;
+import javax.transaction.HeuristicRollbackException;
 import javax.transaction.NotSupportedException;
+import javax.transaction.RollbackException;
 import javax.transaction.SystemException;
-import java.io.Serializable;
-import java.time.LocalDate;
 
 @Named
 @SessionScoped
@@ -26,14 +36,39 @@ public class RegistrationSupportBean implements Serializable {
 
     @Inject
     private JMSContext context;
+    
+    private List<Course> courses ;
 
-    public long getCourseCapacity() {
-        return courseCapacity;
-    }
+	@EJB
+	private CourseDao courseDao;
+	@EJB
+	private RegistrationDao registrationDao;
 
-    public void setCourseCapacity(long courseCapacity) {
-        this.courseCapacity = courseCapacity;
-    }
+	@EJB
+	private PersonDao personDao;
+
+	@PostConstruct
+	public void init() {
+
+		try {
+			courses = courseDao.getCourses();
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NotSupportedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (HeuristicRollbackException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (HeuristicMixedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (RollbackException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 //    public void register() {
 //        try{
@@ -100,17 +135,16 @@ public void register() {
     try {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         final long courseCapacity = Long.parseLong(facesContext.getExternalContext().getInitParameter("course-capacity"));
-        String courseTitle = selectedCourse.split("\\.")[1];
-        Course course = (Course) CourseDao.getCourseByTitle(courseTitle);
+        Course course = (Course) courseDao.getCourseById(Long.valueOf(selectedCourse));
 
         if (course != null) {
-            long numberRegistered = (Long) RegistrationDao.getCourseStatus(course.getCourseTitle());
+            long numberRegistered = (Long) registrationDao.getCourseStatus(course.getCourseTitle());
 
             if (numberRegistered < courseCapacity) {
                 HttpSession session = (HttpSession) facesContext.getExternalContext().getSession(true);
                 Student student = (Student) session.getAttribute("student");
                 Registration registration = new Registration(course.getCourseId(), numberRegistered + 1, student);
-                RegistrationDao.save(registration);
+                registrationDao.save(registration);
                 setMessage("Registration for " + selectedCourse + " successful");
                 setMessageCSSClass("success");
 
@@ -170,6 +204,22 @@ public void register() {
     public void setMessageCSSClass(String messageCSSClass) {
         this.messageCSSClass = messageCSSClass;
     }
+
+    public List<Course> getCourses() {
+		return courses;
+	}
+
+	public void setCourses(List<Course> courses) {
+		this.courses = courses;
+	}
+
+	public long getCourseCapacity() {
+		return courseCapacity;
+	}
+
+	public void setCourseCapacity(long courseCapacity) {
+		this.courseCapacity = courseCapacity;
+	}
 
 
 }

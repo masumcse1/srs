@@ -24,6 +24,13 @@ public class RegistrationController extends HttpServlet {
 
     @EJB
     Status status;
+    
+    @EJB
+    private PersonDao personDao;
+    
+    @EJB
+    private CourseDao courseDao;
+
 
 private void test() throws NamingException,SQLException {
        Connection conn=MyDataSource.getConnection();
@@ -60,9 +67,9 @@ private void test() throws NamingException,SQLException {
                 if(student.getId()!=null && !student.getId().isEmpty()) {
                     boolean isRegistered = false;
                     try {
-                        isRegistered = PersonDao.isRegistered(student.getId());
+                        isRegistered = personDao.isRegistered(student.getId());
                         if(isRegistered ){
-                            if(PersonDao.isStillLoggedIn(student.getId(), student.getPassword())){
+                            if(personDao.isStillLoggedIn(student.getId(), student.getPassword())){
                                 resp.sendRedirect("/srs/dashboard");
                             }
                             else{
@@ -89,8 +96,8 @@ private void test() throws NamingException,SQLException {
                 if(student.getId()!=null && !student.getId().isEmpty()){
                     boolean isRegistered = false;
                     try {
-                        isRegistered = PersonDao.isRegistered(student.getId());
-                        if(isRegistered && PersonDao.isStillLoggedIn(student.getId(), student.getPassword())){
+                        isRegistered = personDao.isRegistered(student.getId());
+                        if(isRegistered && personDao.isStillLoggedIn(student.getId(), student.getPassword())){
                             resp.sendRedirect("/srs/dashboard");
                         }
                         else{
@@ -129,13 +136,13 @@ private void test() throws NamingException,SQLException {
            else{
                 boolean isRegistered=false;
                 try{
-                    isRegistered= PersonDao.isRegistered(student.getId());
+                    isRegistered= personDao.isRegistered(student.getId());
                     if(!isRegistered){
                         resp.sendRedirect("/srs/login");
                     }
                     else{
                         try {
-                            List courses=CourseDao.getCourses();
+                            List courses=courseDao.getCourses();
                             req.setAttribute("courses",courses);
                             req.getRequestDispatcher("/WEB-INF/views/status.jsp").forward(req, resp);
                         } catch (SystemException | NotSupportedException | HeuristicMixedException |
@@ -258,7 +265,7 @@ private void test() throws NamingException,SQLException {
                 Connection conn=null;
                 if (errors.isEmpty()) {
                     try{;
-                        boolean result=PersonDao.save(student);
+                        boolean result=personDao.save(student);
                         if(result){
                             RegistrationSupportBean.setMessage("");
                             req.setAttribute("complete", true);
@@ -285,7 +292,7 @@ private void test() throws NamingException,SQLException {
             }
             else{
                 try {
-                    isRegistered = PersonDao.isRegistered(student.getId());
+                    isRegistered = personDao.isRegistered(student.getId());
                 }
                 catch(SQLException|NamingException e) {
                     System.out.println(e.getMessage());
@@ -297,7 +304,7 @@ private void test() throws NamingException,SQLException {
                 else{
                     List courses=null;
                     try{
-                        courses=CourseDao.getCourses();
+                        courses=courseDao.getCourses();
                         req.setAttribute("courses",courses);
                     }
                     catch (SystemException | NotSupportedException | RollbackException | HeuristicRollbackException| HeuristicMixedException e){

@@ -1,5 +1,10 @@
 package com.chen.srs;
 
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.ejb.EJB;
 import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -9,16 +14,19 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.transaction.NotSupportedException;
 import javax.transaction.SystemException;
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 
 @WebServlet(urlPatterns = {"/student-course-registrations"})
 public class StudentCourseRegistrationsController extends HttpServlet {
+	
+	  @EJB
+	    private PersonDao personDao;
+	  
+	  @EJB
+	    private CourseDao courseDao;
+	  
+	  @EJB
+	   private RegistrationDao registrationDao;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -29,7 +37,7 @@ public class StudentCourseRegistrationsController extends HttpServlet {
         HttpSession session = req.getSession();
         Student student = (Student)session.getAttribute("student");
         try {
-            if(student ==null || student.getId()==null || student.getId().isEmpty() || !PersonDao.isRegistered(student.getId()) || !PersonDao.isStillLoggedIn(student.getId(), student.getPassword())) {
+            if(student ==null || student.getId()==null || student.getId().isEmpty() || !personDao.isRegistered(student.getId()) || !personDao.isStillLoggedIn(student.getId(), student.getPassword())) {
                 resp.sendRedirect("/srs/login");
             }
             else{
@@ -52,7 +60,7 @@ public class StudentCourseRegistrationsController extends HttpServlet {
         HttpSession session = req.getSession();
         Student student = (Student)session.getAttribute("student");
         try {
-            if(student ==null || student.getId()==null || student.getId().isEmpty() || !PersonDao.isRegistered(student.getId()) || !PersonDao.isStillLoggedIn(student.getId(), student.getPassword())) {
+            if(student ==null || student.getId()==null || student.getId().isEmpty() || !personDao.isRegistered(student.getId()) || !personDao.isStillLoggedIn(student.getId(), student.getPassword())) {
                 resp.sendRedirect("/srs/login");
             }
             else{
@@ -65,7 +73,7 @@ public class StudentCourseRegistrationsController extends HttpServlet {
                     req.getRequestDispatcher("/WEB-INF/views/student-course-registrations.jsp").forward(req, resp);
                     return;
                 }
-                List<Person> persons=PersonDao.getPersonsByLastName(lastName);
+                List<Person> persons=personDao.getPersonsByLastName(lastName);
                 if(persons.isEmpty()){
                     text.append("<p>No students exist by that last name</p>");
                     req.setAttribute("CSSClassText","error");
@@ -80,7 +88,7 @@ public class StudentCourseRegistrationsController extends HttpServlet {
                     text.append(" ");
                     text.append(person.lastName);
                     text.append("</p>");
-                    List courseIds=RegistrationDao.getCourseRegistrationsIdsByStudentId(person.getId());
+                    List courseIds=registrationDao.getCourseRegistrationsIdsByStudentId(person.getId());
                     text.append("<p class='p-subtitle'>Course Registrations:</p>");
                     if(courseIds.isEmpty()){
                         text.append("<p>No course registrations</p>");
@@ -89,7 +97,7 @@ public class StudentCourseRegistrationsController extends HttpServlet {
                     Course course=null;
                     for(Object courseId:courseIds){
                         try{
-                            course=(Course)CourseDao.getCourseById((Long)courseId);
+                            course=(Course)courseDao.getCourseById((Long)courseId);
                             text.append("<p>");
                             text.append(course.getCourseTitle());
                             text.append("</p>");

@@ -56,9 +56,11 @@
                             <p class="#{registrationSupportBean.messageCSSClass} text-center">#{registrationSupportBean.message}</p>
                         </div>
                         <div class="form-group">
-                            <h:selectOneListbox size="5" requiredMessage="Please select a course" required="true" layout="pageDirection" value = "#{registrationSupportBean.selectedCourse}">
-                                <f:selectItems value="#{coursesSupportBean.courseItems}" />
+                      
+                       <h:selectOneListbox size="5" requiredMessage="Please select a course" required="true" layout="pageDirection" value = "#{registrationSupportBean.selectedCourse}">
+                                <f:selectItems value="#{registrationSupportBean.courses}"  var="x" itemLabel="#{x.courseTitle}" itemValue="#{x.courseId}"/>
                             </h:selectOneListbox>
+                      
                         </div>
                         <div class="form-group">
                             <h:commandButton class="btn btn-primary" value="register" action="#{registrationSupportBean.register}" />

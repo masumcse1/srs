@@ -10,14 +10,18 @@ import java.util.Map;
 
 @Stateless
 public class Status {
+	
+	
+	@EJB
+   private RegistrationDao registrationDao;
 
     public  Object getStatus(String courseTitle) throws SQLException, NamingException, SystemException, NotSupportedException {
        //return Registration.getStatus(courseId);
 
-        return RegistrationDao.getCourseStatus(courseTitle);
+        return registrationDao.getCourseStatus(courseTitle);
     }
 
     public Map<String, Object> getAllStatus() throws SQLException, NamingException, SystemException, NotSupportedException {
-        return RegistrationDao.getAllStatus();
+        return registrationDao.getAllStatus();
     }
 }

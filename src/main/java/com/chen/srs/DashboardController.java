@@ -1,5 +1,9 @@
 package com.chen.srs;
 
+import java.io.IOException;
+import java.sql.SQLException;
+
+import javax.ejb.EJB;
 import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -9,13 +13,19 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.transaction.NotSupportedException;
 import javax.transaction.SystemException;
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-import java.sql.SQLException;
 
 @WebServlet(urlPatterns = {"/dashboard"})
 public class DashboardController extends HttpServlet {
+	
+	 @EJB
+	 private PersonDao personDao;
+	 
+	  
+	  @EJB
+	    private CourseDao courseDao;
+	  
+	  @EJB
+	   private RegistrationDao registrationDao;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -26,7 +36,7 @@ public class DashboardController extends HttpServlet {
         HttpSession session = req.getSession();
         Student student = (Student)session.getAttribute("student");
         try {
-            if(student ==null || student.getId()==null || student.getId().isEmpty() || !PersonDao.isRegistered(student.getId()) || !PersonDao.isStillLoggedIn(student.getId(), student.getPassword())) {
+            if(student ==null || student.getId()==null || student.getId().isEmpty() || !personDao.isRegistered(student.getId()) || !personDao.isStillLoggedIn(student.getId(), student.getPassword())) {
                 resp.sendRedirect("/srs/login");
             }
             else{
@@ -49,7 +59,7 @@ public class DashboardController extends HttpServlet {
         HttpSession session = req.getSession();
         Student student = (Student)session.getAttribute("student");
         try {
-            if(student ==null || student.getId()==null || student.getId().isEmpty() || !PersonDao.isRegistered(student.getId()) || PersonDao.isStillLoggedIn(student.getId(), student.getPassword())) {
+            if(student ==null || student.getId()==null || student.getId().isEmpty() || !personDao.isRegistered(student.getId()) || personDao.isStillLoggedIn(student.getId(), student.getPassword())) {
                 resp.sendRedirect("/srs/login");
             }
             else{
@@ -69,7 +79,7 @@ public class DashboardController extends HttpServlet {
         else {
             Course course= null;
             try {
-                course = (Course)CourseDao.getCourseByTitle(courseTitle);
+                course = (Course)courseDao.getCourseByTitle(courseTitle);
             } catch (SystemException | NotSupportedException e) {
                 System.out.println(e.getMessage());
                 req.setAttribute("failure",true);
@@ -78,7 +88,7 @@ public class DashboardController extends HttpServlet {
             if(course!=null){
                 Registration registration= null;
                 try {
-                    registration = new Registration(course.getCourseId(),(Long)RegistrationDao.getCourseStatus(course.getCourseTitle()));
+                    registration = new Registration(course.getCourseId(),(Long)registrationDao.getCourseStatus(course.getCourseTitle()));
                 } catch (SystemException | NotSupportedException e) {
                    System.out.println(e.getMessage());
                     req.setAttribute("failure",true);
@@ -86,7 +96,7 @@ public class DashboardController extends HttpServlet {
                 }
                 try {
                     if(registration!=null){
-                        RegistrationDao.save(registration);
+                    	registrationDao.save(registration);
                         req.setAttribute("complete",true);
                         req.getRequestDispatcher("/WEB-INF/views/dashboard.jsp").forward(req, resp);
                     }

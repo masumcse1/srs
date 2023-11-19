@@ -4,35 +4,37 @@ import javax.persistence.*;
 
 import javax.transaction.NotSupportedException;
 import javax.transaction.SystemException;
-import javax.transaction.UserTransaction;
 
-import util.EntityManagerFactoryS;
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 
-import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
+@Stateless
+@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 public class RegistrationDao {
 
-   
-    @PersistenceContext
-    static EntityManager em;
-    @Resource
-    UserTransaction utx;
+	@PersistenceContext
+	private EntityManager em;
+	
+ 
+    @EJB
+    private CourseDao courseDao;
 
-    public static Object getCourseStatus(String courseTitle) throws SystemException, NotSupportedException {
-        Object courseId=CourseDao.getCourseId(courseTitle);
+    public  Object getCourseStatus(String courseTitle) throws SystemException, NotSupportedException {
+        Object courseId=courseDao.getCourseId(courseTitle);
         if(courseId==null)return courseId;
         Long num=new Long(courseId.toString());
-        em=EntityManagerFactoryS.getEntityManagerFactory().createEntityManager();
         Object result=em.createQuery("SELECT COUNT(r.courseId) FROM  Registration r WHERE r.courseId=:courseId").setParameter("courseId",num).getSingleResult();
         return result;
     }
 
-    public static Map<String,Object> getAllStatus() throws SystemException, NotSupportedException {
-        List courseTitles=CourseDao.getCourseTitles();
+    public  Map<String,Object> getAllStatus() throws SystemException, NotSupportedException {
+        List courseTitles=courseDao.getCourseTitles();
         String courseTitle="";
         Map<String,Object> courseStatuses=new HashMap<>();
         for(Object obj: courseTitles){
@@ -42,17 +44,16 @@ public class RegistrationDao {
         return courseStatuses;
     }
 
-    public static List getCourseRegistrationsIdsByStudentId(String id){
-    	em=EntityManagerFactoryS.getEntityManagerFactory().createEntityManager();
-        List registrations= em.createQuery("SELECT DISTINCT r.courseId FROM  Registration r WHERE r.student.id=:studentId").setParameter("studentId",id).getResultList();
+    public  List getCourseRegistrationsIdsByStudentId(String id){
+    	List registrations= em.createQuery("SELECT DISTINCT r.courseId FROM  Registration r WHERE r.student.id=:studentId").setParameter("studentId",id).getResultList();
         return registrations;
     }
 
-    public static void save(Registration registration) throws SystemException, NotSupportedException{
-    	em=EntityManagerFactoryS.getEntityManagerFactory().createEntityManager();
-        em.getTransaction().begin();
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)
+    public  void save(Registration registration) throws SystemException, NotSupportedException{
+       
         em.persist(registration);
-        em.getTransaction().commit();
+       
     }
 
 }

@@ -1,5 +1,6 @@
 package com.chen.srs;
 
+import javax.ejb.EJB;
 import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -15,6 +16,10 @@ import java.sql.SQLException;
 
 @WebServlet(urlPatterns = {"/login"})
 public class LoginController extends HttpServlet {
+	
+	   
+    @EJB
+    private PersonDao personDao;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -35,8 +40,8 @@ public class LoginController extends HttpServlet {
         else{
             boolean isRegistered=false;
             try{
-                isRegistered= PersonDao.isRegistered(student.getId());
-                if(isRegistered && PersonDao.isStillLoggedIn(student.getId(), student.getPassword())){
+                isRegistered= personDao.isRegistered(student.getId());
+                if(isRegistered && personDao.isStillLoggedIn(student.getId(), student.getPassword())){
                     resp.sendRedirect("/srs/dashboard");
                 }
                 else{
@@ -74,7 +79,7 @@ public class LoginController extends HttpServlet {
             }
             Student student =null;
             try {
-                Person person=PersonDao.login(userId, password);
+                Person person=personDao.login(userId, password);
                 if(person !=null && person instanceof Student){
                     student = (Student)person;
                     session.setAttribute("student", student);
@@ -108,8 +113,8 @@ public class LoginController extends HttpServlet {
         else{
             boolean isRegistered=false;
             try{
-                isRegistered= PersonDao.isRegistered(studentAttribute.getId());
-                if(isRegistered && PersonDao.isStillLoggedIn(studentAttribute.getId(), studentAttribute.getPassword())){
+                isRegistered= personDao.isRegistered(studentAttribute.getId());
+                if(isRegistered && personDao.isStillLoggedIn(studentAttribute.getId(), studentAttribute.getPassword())){
                     resp.sendRedirect("/srs/dashboard");
                 }
                 else{
