@@ -16,4 +16,15 @@
    
    
    
-==================JTA ========================
+==================JTA ===================================================================================================
+
+1. Data source 
+
+<datasource jndi-name="java:jboss/datasources/H2_784_JNDI" pool-name="H2_784_DS" enabled="true" use-java-context="true">
+                    <connection-url>jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</connection-url>
+                    <driver>h2</driver>
+                    <security>
+                        <user-name>sa</user-name>
+                        <password>sa</password>
+                    </security>
+                </datasource>
