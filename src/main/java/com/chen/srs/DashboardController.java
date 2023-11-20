@@ -14,6 +14,8 @@ import javax.servlet.http.HttpSession;
 import javax.transaction.NotSupportedException;
 import javax.transaction.SystemException;
 
+import util.BusinessException;
+
 @WebServlet(urlPatterns = {"/dashboard"})
 public class DashboardController extends HttpServlet {
 	
@@ -89,7 +91,7 @@ public class DashboardController extends HttpServlet {
                 Registration registration= null;
                 try {
                     registration = new Registration(course.getCourseId(),(Long)registrationDao.getCourseStatus(course.getCourseTitle()));
-                } catch (SystemException | NotSupportedException e) {
+                } catch (SystemException | NotSupportedException | BusinessException e) {
                    System.out.println(e.getMessage());
                     req.setAttribute("failure",true);
                     req.getRequestDispatcher("/WEB-INF/views/dashboard.jsp").forward(req, resp);

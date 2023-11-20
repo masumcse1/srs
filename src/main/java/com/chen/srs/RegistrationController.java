@@ -17,6 +17,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.xml.registry.infomodel.PersonName;
+
+import util.BusinessException;
+
 import java.sql.Statement;
 
 @WebServlet(urlPatterns = {"/a", "/b", "/reset","/status"})
@@ -321,7 +324,12 @@ private void test() throws NamingException,SQLException {
                         count++;
                         String name=names.nextElement();
                         try{
-                            numRegistered=status.getStatus(name);
+                            try {
+								numRegistered=status.getStatus(name);
+							} catch (BusinessException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
                             if(numRegistered!=null){
                                 text.append("<p>");
                                 text.append(name);
@@ -348,7 +356,12 @@ private void test() throws NamingException,SQLException {
                     if(count==0){
                         Map<String,Object> courseStatuses=new HashMap<>();
                         try {
-                            courseStatuses=status.getAllStatus();
+                            try {
+								courseStatuses=status.getAllStatus();
+							} catch (BusinessException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
                             Set<String> courseTitles=courseStatuses.keySet();
                             Iterator<String> iterator=courseTitles.iterator();
                             String courseTitle="";

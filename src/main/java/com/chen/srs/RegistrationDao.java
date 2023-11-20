@@ -5,6 +5,8 @@ import javax.persistence.*;
 import javax.transaction.NotSupportedException;
 import javax.transaction.SystemException;
 
+import util.BusinessException;
+
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
@@ -25,15 +27,27 @@ public class RegistrationDao {
     @EJB
     private CourseDao courseDao;
 
-    public  Object getCourseStatus(String courseTitle) throws SystemException, NotSupportedException {
-        Object courseId=courseDao.getCourseId(courseTitle);
-        if(courseId==null)return courseId;
-        Long num=new Long(courseId.toString());
-        Object result=em.createQuery("SELECT COUNT(r.courseId) FROM  Registration r WHERE r.courseId=:courseId").setParameter("courseId",num).getSingleResult();
-        return result;
-    }
-
-    public  Map<String,Object> getAllStatus() throws SystemException, NotSupportedException {
+    public  Object getCourseStatus(String courseTitle) throws SystemException, NotSupportedException, BusinessException {
+    	Object result = null;
+    	try {
+    	    Object courseId=courseDao.getCourseId(courseTitle);
+            if(courseId==null)return courseId;
+            Long num=new Long(courseId.toString());
+             result=em.createQuery("SELECT COUNT(r.courseId) FROM  Registration r WHERE r.courseId=:courseId").setParameter("courseId",num)
+            		 .setLockMode(LockModeType.READ).getSingleResult();
+           
+    		
+    	}catch (Exception e) {
+			System.out.println("Mylock Exception :################ "+e.getMessage());
+			throw new BusinessException("pessimistic locking   occured");
+    		
+		}
+		return result;
+        }
+    //https://arnoldgalovics.com/jpa-pessimistic-locking/
+    //https://blog.mimacom.com/handling-pessimistic-locking-jpa-oracle-mysql-postgresql-derbi-h2/
+    
+    public  Map<String,Object> getAllStatus() throws SystemException, NotSupportedException, BusinessException {
         List courseTitles=courseDao.getCourseTitles();
         String courseTitle="";
         Map<String,Object> courseStatuses=new HashMap<>();
