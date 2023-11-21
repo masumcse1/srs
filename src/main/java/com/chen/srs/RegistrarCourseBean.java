@@ -77,5 +77,53 @@ public class RegistrarCourseBean {
 	   
 	    }
 	}
+    
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public String registerWithLongRunning(long selectedCourse ,long courseCapacity ,Student student ) throws BusinessException {
+	    
+    
+    	try {
+	       
+    		 Thread.sleep(420000); 
+	        Course course = (Course) courseDao.getCourseById(selectedCourse);
+           String message ;
+	        if (course != null) {
+	            long numberRegistered = (Long) registrationDao.getCourseStatus(course.getCourseTitle());
+
+	            if (numberRegistered < courseCapacity) {
+	                 Registration registration = new Registration(course.getCourseId(), numberRegistered + 1, student);
+	                 registrationDao.save(registration);
+	                 message = "Registration for " + selectedCourse + " successful";
+	        
+	                try {
+
+	                    MapMessage mapmessage = context.createMapMessage();
+	                    mapmessage.setString("User_ID", student.getId());
+	                    mapmessage.setLong("Course_ID", course.getCourseId());
+	                    mapmessage.setString("Course_Name", course.getCourseTitle());
+	                    mapmessage.setString("Date_of_Registration", LocalDate.now().toString());
+
+	            		context.createProducer().send(topic, mapmessage);
+	            		   System.out.println("Message send done!");
+	            		   return message;
+	                } catch (JMSException e) {
+	                    throw new BusinessException(e.getMessage());
+	                }
+	            } else {
+	            	// Implement Rule : 
+	            	throw new BusinessException("You have reached the maximum number of Student registered limit");
+
+	            }
+	        } else {
+	        	throw new BusinessException("Course does not exist");
+	         }
+	    }
+	  catch (SystemException | NotSupportedException | InterruptedException e) {
+	        // Handle exception
+	        System.out.println("Error during registration: " + e.getMessage());
+	        throw new BusinessException(e.getMessage());
+	   
+	    } 
+	}
 
 }

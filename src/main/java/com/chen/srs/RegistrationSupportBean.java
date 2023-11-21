@@ -86,6 +86,23 @@ public class RegistrationSupportBean implements Serializable {
 	    }
 	}
 
+	public void registerLongRun() {
+	    try {
+	        FacesContext facesContext = FacesContext.getCurrentInstance();
+	        final long courseCapacity = Long.parseLong(facesContext.getExternalContext().getInitParameter("course-capacity"));
+	        HttpSession session = (HttpSession) facesContext.getExternalContext().getSession(true);
+            Student student = (Student) session.getAttribute("student");
+	        String successMessage = registrarCourseBean.registerWithLongRunning(Long.valueOf(selectedCourse), courseCapacity, student);
+	        setMessage(successMessage);
+	        setMessageCSSClass("success");
+	        
+	    } catch (Exception e) {
+	        // Handle exception
+	        System.out.println("Error during registration: " + e.getMessage());
+	        setMessage(e.getMessage());
+	        setMessageCSSClass("error");
+	    }
+	}
 
 
 
