@@ -7,6 +7,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.sql.*;
 import java.util.*;
+import java.util.Date;
 import java.util.function.BiFunction;
 import javax.ejb.EJB;
 import javax.naming.NamingException;
@@ -33,6 +34,8 @@ public class RegistrationController extends HttpServlet {
     
     @EJB
     private CourseDao courseDao;
+    
+    private UserRegistrationBean userRegistrationBean;
 
 
 private void test() throws NamingException,SQLException {
@@ -267,8 +270,11 @@ private void test() throws NamingException,SQLException {
                 student.setErrorsFormB(errors);
                 Connection conn=null;
                 if (errors.isEmpty()) {
-                    try{;
-                        boolean result=personDao.save(student);
+                    try{
+                    	student.setRegistrationDate(new Date());
+                    	int maximumStudentLimit=1;
+                    	boolean result = userRegistrationBean.save(student,maximumStudentLimit);
+                       // boolean result=personDao.save(student);
                         if(result){
                             RegistrationSupportBean.setMessage("");
                             req.setAttribute("complete", true);
@@ -279,7 +285,7 @@ private void test() throws NamingException,SQLException {
                         }
                         session.removeAttribute("student");
                     }
-                    catch(NamingException | NoSuchAlgorithmException | InvalidKeySpecException | SQLException e){
+                    catch(NamingException | NoSuchAlgorithmException | InvalidKeySpecException | SQLException | BusinessException e){
                         System.out.println(e.getMessage());
                         req.setAttribute("failure", true);
                     }

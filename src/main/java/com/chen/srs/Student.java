@@ -1,6 +1,8 @@
 package com.chen.srs;
 
 import javax.persistence.*;
+
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +21,9 @@ public class Student extends Person {
 
     @Column(name="level",nullable=false)
     private String level;
+    
+    @Column(name="level",nullable=false)
+    private Date registrationDate;
 
     @OneToMany(mappedBy="student", orphanRemoval=true)
     private List<Registration> courseRegistrations;
@@ -66,8 +71,16 @@ public class Student extends Person {
     public void setLevel(String level) {
         this.level = level;
     }
+    
+    public Date getRegistrationDate() {
+		return registrationDate;
+	}
 
-    @Override
+	public void setRegistrationDate(Date registrationDate) {
+		this.registrationDate = registrationDate;
+	}
+
+	@Override
     public String toString() {
         return "Student{" +
                 "id='" + id + '\'' +
