@@ -22,7 +22,8 @@ public class Student extends Person {
     @Column(name="level",nullable=false)
     private String level;
     
-    @Column(name="level",nullable=false)
+    @Column(name="registrationDate",nullable=false)
+    @Temporal(TemporalType.DATE)
     private Date registrationDate;
 
     @OneToMany(mappedBy="student", orphanRemoval=true)

@@ -32,6 +32,11 @@
                             Something went wrong
                         </div>
                     </c:if>
+                      <c:if test="${registermaximumlimitover}">
+                        <div class="alert alert-danger">
+                            students registering during a given timeframe maximum limit over
+                        </div>
+                    </c:if>
                     <c:if test="${duplicate}">
                         <div class="alert alert-danger">
                             Account already exists in our system.  Please login.  If you forgot your userid or password please contact the administration department.

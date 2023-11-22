@@ -34,7 +34,7 @@ public class RegistrationController extends HttpServlet {
     
     @EJB
     private CourseDao courseDao;
-    
+    @EJB
     private UserRegistrationBean userRegistrationBean;
 
 
@@ -287,7 +287,14 @@ private void test() throws NamingException,SQLException {
                     }
                     catch(NamingException | NoSuchAlgorithmException | InvalidKeySpecException | SQLException | BusinessException e){
                         System.out.println(e.getMessage());
-                        req.setAttribute("failure", true);
+                        
+                        if(e.getMessage().equalsIgnoreCase("registermaximumlimitover")) {
+                        	req.setAttribute("registermaximumlimitover", true);
+                        }else{
+                        	req.setAttribute("failure", true);
+                        }
+                        
+                        
                     }
                 }
                 req.getRequestDispatcher("/WEB-INF/views/b.jsp").forward(req, resp);

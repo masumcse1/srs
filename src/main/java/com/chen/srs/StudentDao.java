@@ -4,28 +4,34 @@ package com.chen.srs;
 
 import java.util.Date;
 
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import util.BusinessException;
 
-public class StudentDao extends PersonDao {
+
+@Stateless
+@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+public class StudentDao  {
 
 	@PersistenceContext
 	private EntityManager em;
 
-	public Integer getTotalNoOfStudentRegistered() throws BusinessException {
+	public long getTotalNoOfStudentRegistered() throws BusinessException {
 
-		Integer numberOfStudents = 0 ;
+		long numberOfStudents = 0 ;
 		try {
 			Date today = new Date(); 
-			numberOfStudents = (int) em
+			numberOfStudents = (long) em
 					.createQuery("SELECT COUNT(s) FROM Student s WHERE s.registrationDate=:registrationDate")
 					.setParameter("registrationDate", today)
 					.getSingleResult();
 
 		} catch (Exception e) {
-			System.out.println("not more than X students registering during a given timeframe"+ e.getMessage());
+			System.out.println("registermaximumlimitover"+ e.getMessage());
 			throw new BusinessException(e.getMessage());
 
 		}

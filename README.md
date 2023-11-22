@@ -1,4 +1,12 @@
 # srs
+
+   
+### Test Username/Password combinations
+apple
+12345678
+
+987654343
+
 ================Configure=================
  wildfy start : sh standalone.sh -c standalone-full.xml
  

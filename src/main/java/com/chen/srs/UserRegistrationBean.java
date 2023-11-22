@@ -26,11 +26,11 @@ public class UserRegistrationBean {
     public  boolean save(Student student , Integer maximumlimtOfRegistration) throws SQLException, NoSuchAlgorithmException, InvalidKeySpecException, BusinessException, NamingException{
 		
 	
-			Integer totalNoOfStudentRegistered = studentDao.getTotalNoOfStudentRegistered();
+		long totalNoOfStudentRegistered = studentDao.getTotalNoOfStudentRegistered();
 			
-			if(totalNoOfStudentRegistered < maximumlimtOfRegistration ) {
-				System.out.println("students registering during a given timeframe");
-				throw new BusinessException("students registering during a given timeframe maximum limit over");
+			if(totalNoOfStudentRegistered > maximumlimtOfRegistration ) {
+				System.out.println("registermaximumlimitover");
+				throw new BusinessException("registermaximumlimitover");
 			}
 			
 			boolean result=personDao.save(student);
