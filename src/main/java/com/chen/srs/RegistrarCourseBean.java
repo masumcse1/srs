@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import javax.annotation.Resource;
 import javax.ejb.EJB;
+import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
@@ -17,8 +18,10 @@ import javax.transaction.SystemException;
 
 import util.BusinessException;
 
+
 @Stateless
-public class RegistrarCourseBean {
+@Remote(IRegistrarCourseBean.class)
+public class RegistrarCourseBean implements IRegistrarCourseBean {
 	
 	@EJB
 	private CourseDao courseDao;
