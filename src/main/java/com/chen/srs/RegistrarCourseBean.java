@@ -33,10 +33,8 @@ public class RegistrarCourseBean implements IRegistrarCourseBean {
 
     @Inject
     private JMSContext context;
+
     
-	@EJB
-	private RegistrarCourseBean registrarCourseBean;
-	
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public String register(long selectedCourse ,long courseCapacity ,Student student ) throws BusinessException {
 	    try {
@@ -82,7 +80,7 @@ public class RegistrarCourseBean implements IRegistrarCourseBean {
 	}
     
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public String registerWithLongRunning(long selectedCourse ,long courseCapacity ,Student student ) throws BusinessException {
+  public String registerWithLongRunning(long selectedCourse ,long courseCapacity ,Student student ) throws BusinessException {
 	    
     
     	try {

@@ -1,28 +1,23 @@
 package com.chen.srs;
 
 import java.io.Serializable;
-import java.time.LocalDate;
+import java.util.Hashtable;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import javax.ejb.EJB;
 import javax.enterprise.context.SessionScoped;
 import javax.faces.context.FacesContext;
-import javax.inject.Inject;
 import javax.inject.Named;
-import javax.jms.JMSContext;
-import javax.jms.JMSException;
-import javax.jms.MapMessage;
-import javax.jms.Topic;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.servlet.http.HttpSession;
 import javax.transaction.HeuristicMixedException;
 import javax.transaction.HeuristicRollbackException;
 import javax.transaction.NotSupportedException;
 import javax.transaction.RollbackException;
 import javax.transaction.SystemException;
-
-import util.BusinessException;
 
 @Named
 @SessionScoped
@@ -40,9 +35,6 @@ public class RegistrationSupportBean implements Serializable {
 	@EJB
 	private CourseDao courseDao;
 	
-	@EJB
-	private RegistrarCourseBean registrarCourseBean;
-
 	
 	@PostConstruct
 	public void init() {
@@ -68,13 +60,22 @@ public class RegistrationSupportBean implements Serializable {
 	}
 
 
+	private  IRegistrarCourseBean lookupRegistrarCourseBean() throws NamingException {
+		final Hashtable jndiProperties = new Hashtable();
+		jndiProperties.put(Context.INITIAL_CONTEXT_FACTORY, "org.wildfly.naming.client.WildFlyInitialContextFactory");
+		final Context context = new InitialContext(jndiProperties);
+		return (IRegistrarCourseBean) context.lookup("ejb:/srs/RegistrarCourseBean!com.chen.IRegistrarCourseBean");
+	}
+	
 	public void register() {
 	    try {
 	        FacesContext facesContext = FacesContext.getCurrentInstance();
 	        final long courseCapacity = Long.parseLong(facesContext.getExternalContext().getInitParameter("course-capacity"));
 	        HttpSession session = (HttpSession) facesContext.getExternalContext().getSession(true);
             Student student = (Student) session.getAttribute("student");
-	        String successMessage = registrarCourseBean.register(Long.valueOf(selectedCourse), courseCapacity, student);
+	       
+           IRegistrarCourseBean iRegistrarCourseBean = lookupRegistrarCourseBean();
+            String successMessage = iRegistrarCourseBean.register(Long.valueOf(selectedCourse), courseCapacity, student);
 	        setMessage(successMessage);
 	        setMessageCSSClass("success");
 	        
@@ -92,7 +93,9 @@ public class RegistrationSupportBean implements Serializable {
 	        final long courseCapacity = Long.parseLong(facesContext.getExternalContext().getInitParameter("course-capacity"));
 	        HttpSession session = (HttpSession) facesContext.getExternalContext().getSession(true);
             Student student = (Student) session.getAttribute("student");
-	        String successMessage = registrarCourseBean.registerWithLongRunning(Long.valueOf(selectedCourse), courseCapacity, student);
+            
+            IRegistrarCourseBean iRegistrarCourseBean = lookupRegistrarCourseBean();
+	        String successMessage = iRegistrarCourseBean.registerWithLongRunning(Long.valueOf(selectedCourse), courseCapacity, student);
 	        setMessage(successMessage);
 	        setMessageCSSClass("success");
 	        
