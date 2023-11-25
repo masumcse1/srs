@@ -1,6 +1,8 @@
 package com.chen.srs;
 
 import javax.persistence.*;
+
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,7 +13,7 @@ import static javax.persistence.InheritanceType.*;
 @Table(name="Person")
 @Inheritance(strategy=JOINED)
 @DiscriminatorColumn(name="USER_TYPE", discriminatorType= STRING, length=255)
-public abstract class Person {
+public abstract class Person implements Serializable {
 
     @Id
     @Column(name = "USER_ID")

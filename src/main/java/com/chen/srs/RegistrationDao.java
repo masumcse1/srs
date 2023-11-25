@@ -67,6 +67,7 @@ public class RegistrationDao {
     public  void save(Registration registration) throws SystemException, NotSupportedException{
        
         em.persist(registration);
+        em.flush();
        
     }
 

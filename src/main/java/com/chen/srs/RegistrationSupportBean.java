@@ -60,12 +60,7 @@ public class RegistrationSupportBean implements Serializable {
 	}
 
 
-	private  IRegistrarCourseBean lookupRegistrarCourseBean() throws NamingException {
-		final Hashtable jndiProperties = new Hashtable();
-		jndiProperties.put(Context.INITIAL_CONTEXT_FACTORY, "org.wildfly.naming.client.WildFlyInitialContextFactory");
-		final Context context = new InitialContext(jndiProperties);
-		return (IRegistrarCourseBean) context.lookup("ejb:/srs/RegistrarCourseBean!com.chen.IRegistrarCourseBean");
-	}
+	
 	
 	public void register() {
 	    try {
@@ -107,7 +102,12 @@ public class RegistrationSupportBean implements Serializable {
 	    }
 	}
 
-
+	private  IRegistrarCourseBean lookupRegistrarCourseBean() throws NamingException {
+		final Hashtable jndiProperties = new Hashtable();
+		jndiProperties.put(Context.INITIAL_CONTEXT_FACTORY, "org.wildfly.naming.client.WildFlyInitialContextFactory");
+		final Context context = new InitialContext(jndiProperties);
+		return (IRegistrarCourseBean) context.lookup("ejb:/srs/RegistrarCourseBean!com.chen.srs.IRegistrarCourseBean");
+	}
 
     public String getSelectedCourse() {
         return selectedCourse;
