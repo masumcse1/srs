@@ -1,8 +1,17 @@
+================Configure=================
+ wildfy start : sh standalone.sh -c standalone-full.xml
 
+ 
+ create management user : sh add-user.sh -a -u masum -p Masum@1234  
 
-Please give me your gmail account for futher communication if needed.
+  create app user :       sh add-user.sh -a -u murad -p Murad@1234 -g guest
 
+                         sh jboss-cli.sh 
 
-I am requesting you please appeded following line into your feedback.
-
-   he  has a lot of experience and knowledge in Java enterprise (JEE) technology.
+                         connect 
+ 
+ create topic :    jms-topic add --topic-address=RegCourseTopic --entries=topic/RegCourseTopic,java:jboss/exported/jms/topic/RegCourseTopic
+  
+  xml :            <jms-topic name="RegCourseTopic" entries="topic/RegCourseTopic java:jboss/exported/jms/topic/RegCourseTopic"/>
+   
+   
